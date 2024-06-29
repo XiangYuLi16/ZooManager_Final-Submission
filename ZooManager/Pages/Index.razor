@@ -1,0 +1,275 @@
+﻿@page "/"
+@using ZooManager
+
+<style>
+    button {
+        width: 75px;
+        height: 75px;
+        font-size: 50px;
+    }
+
+        button.sm {
+            display: inline-flex;
+            width: 50px;
+            height: 50px;
+            justify-content: center;
+            align-items: center;
+            font-size: 30px;
+        }
+
+        button.wide {
+            display: inline-flex;
+            width: 200px;
+            height: 75px;
+            justify-content: center;
+            align-items: center;
+            font-size: 30px;
+        }
+
+        button.garden {
+            width: 75px;
+            height: 75px;
+            font-size: 50px;
+            background-color: #66ff66;
+        }
+
+        button.pot {
+            width: 75px;
+            height: 75px;
+            font-size: 50px;
+            background-color: #ff6699;
+        }
+
+</style>
+
+<div class="container">
+
+    <div class="row">
+        <div class="col">
+            <hr />
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-6">
+            <h1 style="text-align:end">Automatic Adding:</h1>
+        </div>
+        <div class="col-1">
+            <button type="button" class="btn btn-outline-dark" disabled>
+                <h2>🌸 <sup>@Game.flowerRemainingRound / @Game.flowerCDTime</sup> </h2>
+            </button>
+            
+
+        </div>
+
+        <div class="col-1">
+            <button type="button" class="btn btn-outline-dark" disabled>
+                <h2>🐭 <sup>@Game.mouseRemainingRound / @Game.mouseCDTime</sup> </h2>
+            </button>
+
+        </div>
+
+        <div class="col-1">
+            <button type="button" class="btn btn-outline-dark" disabled>
+                <h2>🐺<sup>@Game.wolfRemainingRound / @Game.wolfCDTime</sup> </h2>
+            </button>
+
+
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col">
+            <hr />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-6">
+            <h1 style="text-align:end">Add to Holding:</h1>
+        </div>
+        <div class="col-1">
+            @if (Game.catRemainingRound != 0)
+            {
+                <button @onclick="@(() => Game.AddToHolding("cat"))"
+                        type="button" class="btn btn-outline-dark" disabled>
+                    <h2>🐱 <sup>@Game.catRemainingRound / @Game.catCDTime</sup> </h2>
+                </button>
+            }
+            else
+            {
+                <button @onclick="@(() => Game.AddToHolding("cat"))"
+                        type="button" class="btn btn-outline-dark">
+                    <h2>🐱 <sup>@Game.catRemainingRound / @Game.catCDTime</sup> </h2>
+                </button>
+            }
+
+        </div>
+
+        <div class="col-1">
+            @if (Game.keeperRemainingRound != 0)
+            {
+                <button @onclick="@(() => Game.AddToHolding("gardenKeeper"))"
+                        type="button" class="btn btn-outline-dark" disabled>
+                    <h2>🚶‍♂️ <sup>@Game.keeperRemainingRound / @Game.keeperCDTime </sup> </h2>
+                </button>
+            }
+            else
+            {
+                <button @onclick="@(() => Game.AddToHolding("gardenKeeper"))"
+                        type="button" class="btn btn-outline-dark">
+                    <h2>🚶‍♂️  <sup>@Game.keeperRemainingRound / @Game.keeperCDTime</sup> </h2>
+                </button>
+            }
+
+        </div>
+
+        <div class="col-1">
+            @if (Game.trapRemainingRound != 0)
+            {
+                <button @onclick="@(() => Game.AddToHolding("trap"))"
+                        type="button" class="btn btn-outline-dark" disabled>
+                    <h2>💣 <sup>@Game.trapRemainingRound / @Game.trapCDTime</sup> </h2>
+                </button>
+            }
+            else
+            {
+                <button @onclick="@(() => Game.AddToHolding("trap"))"
+                        type="button" class="btn btn-outline-dark">
+                    <h2>💣 <sup>@Game.trapRemainingRound / @Game.trapCDTime</sup> </h2>
+                </button>
+            }
+
+        </div>
+    </div>
+       
+
+    <div class="row">
+        <div class="col">
+            <hr />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-6">
+            <h1 style="text-align:end">Holding Pen:</h1>
+        </div>
+        <div class="col-6">
+            <button  @onclick="@(() => Game.HoldingZoneClick())" type="button" class="btn btn-outline-dark">
+                <h2>@Game.holdingPen.emoji</h2>
+            </button>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col">
+            <hr />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <h1 style="text-align:center">Current Round: @roundCounter</h1>
+            @if (gameWon)
+            {
+                <h1 style="text-align:center">You win! 9 flowers placed in the center.</h1>
+            }
+            else if (Game.gameLost)
+            {
+                <h1 style="text-align:center">You lose! No flowers remaining in the center.</h1>
+                
+                <button @onclick="NewGame" type="button" class="wide btn btn-outline-dark">
+                    <h2>New Game</h2>
+                </button>
+                
+            }
+            else
+            {
+                <button @onclick="NextRound" type="button" class="wide btn btn-outline-dark">
+                    <h2>Next Round</h2>
+                </button>
+            }
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <hr />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <table align="center">
+                @for (var y = 0; y < Game.numCellsY; y++)
+                {
+                    <tr>
+                        @for (var x = 0; x < Game.numCellsX; x++)
+                        {
+                            var a = Game.animalZones[y][x];
+
+                            <td>
+                                @if (Game.IsFlowerPotZone(y, x))
+                                {
+                                    <button @onclick="@(() => Game.ZoneClick(a))"
+                                            type="button" class="pot btn btn-outline-dark">
+                                        <h2>@a.emoji</h2>
+                                    </button>
+                                }
+                                else if (Game.IsGardenZone(y, x))
+                                {
+                                    <button @onclick="@(() => Game.ZoneClick(a))"
+                                            type="button" class="garden btn btn-outline-dark">
+                                        <h2>@a.emoji</h2>
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button @onclick="@(() => Game.ZoneClick(a))"
+                                            type="button" class="btn btn-outline-dark">
+                                        <h2>@a.emoji</h2>
+                                    </button>
+                                }
+
+                            </td>
+
+
+                        }
+                    </tr>
+                }
+            </table>
+        </div>
+    </div>
+</div>
+
+@code {
+    private int roundCounter = 0;
+    private bool gameWon = false;
+    private string catStr = "";
+    private string keeperStr = "";
+    private string trapStr = "";
+
+
+
+    protected override void OnInitialized()
+    {
+        Game.SetUpGame();
+        catStr = (Game.catRemainingRound == 0) ? "" : "disabled";
+        keeperStr = (Game.keeperRemainingRound == 0) ? "" : "disabled";
+        trapStr = (Game.trapRemainingRound == 0) ? "" : "disabled";
+    }
+
+    private void NextRound()
+    {
+        Game.NextRound();
+        roundCounter++;
+        gameWon = Game.gameWon; // Access the game state to check if the game has been won
+        catStr = (Game.catRemainingRound == 0) ? "" : "disabled";
+        keeperStr = (Game.keeperRemainingRound == 0) ? "" : "disabled";
+        trapStr = (Game.trapRemainingRound == 0) ? "" : "disabled";
+    }
+
+    private void NewGame()
+    {
+        Game.SetUpGame();
+        catStr = (Game.catRemainingRound == 0) ? "" : "disabled";
+        keeperStr = (Game.keeperRemainingRound == 0) ? "" : "disabled";
+        trapStr = (Game.trapRemainingRound == 0) ? "" : "disabled";
+    }
+}
+
